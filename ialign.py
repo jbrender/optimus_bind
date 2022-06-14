@@ -3,7 +3,12 @@ import time
 from pathlib import Path
 import linecache
 import re
-import pandas as pd
+try:
+    import pandas as pd
+except:
+    import os
+    os.system('cmd /c "python -m pip install pandas"')
+
 from numpy import log as ln
 #
 # Bash command arguments

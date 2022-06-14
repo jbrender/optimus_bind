@@ -1,37 +1,36 @@
 # Defines the properties associated with one mutation
 # Protein.py defines protein level properties
-
-
 import pandas as pd
 import numpy as np
 
-ITSM_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\iPTM.csv"
-ITSM=pd.read_csv (ITSM_loc,index_col=0,header=0)
-Blosum62_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\blosumPTSM.csv"
-Blosum62 = pd.read_csv (Blosum62_loc,index_col=0,header=0)
-VolAA_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\volume.csv"
-VolAA=pd.read_csv (VolAA_loc,index_col=0,header=0)
 class MutationMethods:
     def __init__(self):
         self.AA_list={'A','G','P','K','R','T','Y','L','I','V','D','E','W','F','H','C','M','S','Q','N'}
-
+        ITSM_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\iPTM.csv"
+        self.ITSM=pd.read_csv (ITSM_loc,index_col=0,header=0)
+        Blosum62_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\blosumPTSM.csv"
+        self.Blosum62 = pd.read_csv (Blosum62_loc,index_col=0,header=0)
+        VolAA_loc="C:\\Users\\jbren\\OneDrive\\Documents\\Optimus\\volume.csv"
+        self.VolAA=pd.read_csv (VolAA_loc,index_col=0,header=0)
         
     def getSubMatrix(self,mutcode,SM):          
         WT_AA=mutcode[0]
         mut_AA=mutcode[-1]
         if SM == 'ITSM':
-            SMScore=np.log(ITSM.at[WT_AA,mut_AA])
+            SMScore=np.log(self.ITSM.at[WT_AA,mut_AA]/self.ITSM.at[WT_AA,WT_AA])
         elif SM == 'Blosum':
-            SMScore=np.log(Blosum62.at[WT_AA,mut_AA])
+            SMScore=self.Blosum62.at[WT_AA,mut_AA]-self.Blosum62.at[WT_AA,WT_AA]
         return SMScore
         
     def getSMScore(self,mutset,SM):
-        SMScore=0
+        SMScore=0.0
+
+        mutset=mutset[0].split(",")
         for mut in mutset:
-            self.SMScore=self.getSubMatrix(mut,SM)+SMScore
+            SMScore=self.getSubMatrix(mut,SM)+SMScore
         return SMScore
     
-    def HasProline(self,mutset):
+    def CheckProline(self,mutset):
         HasProline=0
         for mut in mutset:
             WT_AA=mut[0]
@@ -41,7 +40,7 @@ class MutationMethods:
             self.HasProline=HasProline
         return HasProline
         
-    def HasGlycine(self,mutset):
+    def CheckGlycine(self,mutset):
         HasGlycine=0
         for mut in mutset:
             WT_AA=mut[0]
@@ -56,7 +55,7 @@ class MutationMethods:
         for mut in mutset:
             WT_AA=mut[0]
             mut_AA=mut[-1]
-            vol_change=VolAA.at[mut_AA,'vol']-VolAA.at[WT_AA,'vol']
+            vol_change=self.VolAA.at[mut_AA,'vol']-VolAA.at[WT_AA,'vol']
             if vol_change<Small:
                 Small=vol_change
             self.Small=Small
@@ -67,7 +66,7 @@ class MutationMethods:
         for mut in mutset:
             WT_AA=mut[0]
             mut_AA=mut[-1]
-            vol_change=VolAA.at[mut_AA,'vol']-VolAA.at[WT_AA,'vol']
+            vol_change=self.VolAA.at[mut_AA,'vol']-VolAA.at[WT_AA,'vol']
             if vol_change>Large:
                 Large=vol_change
             self.Large=Large

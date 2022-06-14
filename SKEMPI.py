@@ -107,7 +107,10 @@ class MutantDataSet(pd.DataFrame):
 def clean_Skempi(path):
 # Initialize class
     skempi = MutantDataSet(path, sep=';')
-
+    
+# Convert PDB so that it is easier to find later
+    skempi['PDB']= skempi['#Pdb'].str.slice(start=0, stop=4, step=1)
+    
 # Convert non-numeric temperature comments to numeric values. Default is 298K 
     skempi['Temperature'] = skempi['Temperature'].str.extract(r'(\d+)')
     skempi['Temperature'] = skempi.to_numeric('Temperature')
